@@ -153,7 +153,6 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 | `scripts/install.sh` | Build and install/update into /Applications, then activate Quick Look. |
 | `scripts/build.sh` | Builds the ad-hoc-signed DMG for distribution. |
 | `scripts/uninstall.sh` | Manual uninstall: remove app, unregister, refresh Quick Look. |
-| `scripts/make-demo.sh` | Convert a screen recording into `docs/demo.gif`. |
 | `Casks/` | Homebrew Cask template. |
 | `examples/` | Sample Markdown files. |
 
