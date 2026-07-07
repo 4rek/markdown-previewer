@@ -18,6 +18,12 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Test
+        run: |
+          xcodegen generate
+          xcodebuild -project MarkdownPreviewer.xcodeproj \
+            -scheme RendererTests -destination 'platform=macOS' test
+
       - name: Build DMG
         run: ./scripts/build.sh
 
