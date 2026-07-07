@@ -40,14 +40,18 @@ hdiutil create \
   -srcfolder "$STAGING" \
   -ov -format UDZO \
   "$DIST/MarkdownPreviewer.dmg" >/dev/null
-rm -rf "$STAGING"
 
-# xcodebuild auto-registers the freshly built .app with LaunchServices, which
-# makes a *second* Quick Look extension appear alongside any copy installed in
-# /Applications. Un-register the build-folder copy so it doesn't pollute the
-# system extensions list — the DMG is the only artifact we care about here.
+# Building and packaging auto-registers these throwaway .app copies with
+# LaunchServices, which makes duplicate Quick Look extensions appear next to the
+# copy installed in /Applications. Un-register them — the DMG is the only
+# artifact we care about here.
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister"
-[ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$APP" >/dev/null 2>&1 || true
+if [ -x "$LSREGISTER" ]; then
+  "$LSREGISTER" -u "$STAGING/$APP_NAME.app" >/dev/null 2>&1 || true
+  "$LSREGISTER" -u "$APP" >/dev/null 2>&1 || true
+fi
+
+rm -rf "$STAGING"
 
 echo "==> Done: $DIST/MarkdownPreviewer.dmg"
 echo -n "    sha256: "
