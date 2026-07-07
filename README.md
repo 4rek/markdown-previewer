@@ -2,88 +2,151 @@
 
 A tiny macOS **Quick Look** extension that renders Markdown files with clean,
 GitHub-style formatting. Select any `.md` file in Finder, press <kbd>Space</kbd>,
-and see rendered Markdown instead of raw text — tables, task lists, code blocks,
-and all. Light and dark mode aware.
+and see rendered Markdown instead of raw text — headings, tables, task lists,
+code blocks, and more. Light- and dark-mode aware.
 
 > Does one thing well: previews Markdown. No settings to fiddle with.
 
+**Requirements:** macOS 13 (Ventura) or later.
+
+---
+
 ## Install
 
-### Homebrew (recommended)
+There are two ways to install. Building from source works today; the Homebrew
+route becomes available once the app is published to a tap (see
+[Releasing](#releasing-for-maintainers)).
+
+### Option A — Build from source
+
+You need [Xcode](https://apps.apple.com/app/xcode/id497799835) and
+[XcodeGen](https://github.com/yonaskolb/XcodeGen):
+
+```sh
+brew install xcodegen
+
+git clone https://github.com/OWNER/markdown-previewer.git
+cd markdown-previewer
+./scripts/build.sh
+```
+
+This produces `dist/MarkdownPreviewer.dmg`. Open it, drag **Markdown Previewer**
+into **Applications**, then continue to [Enable it](#enable-it).
+
+### Option B — Homebrew *(once published)*
 
 ```sh
 brew install --cask OWNER/tap/markdown-previewer
 ```
 
-*(Replace `OWNER` once you publish your tap — see [Releasing](#releasing).)*
+Homebrew installs the app and clears the download quarantine for you. Then
+continue to [Enable it](#enable-it).
 
-### Manual
+### Option C — Direct download *(once published)*
 
 1. Download `MarkdownPreviewer.dmg` from the [latest release](https://github.com/OWNER/markdown-previewer/releases/latest).
-2. Drag **Markdown Previewer** to **Applications**.
-3. Launch it once (it registers the Quick Look extension).
+2. Drag **Markdown Previewer** into **Applications**.
 
-## First-time setup
+---
 
-Because this build is **ad-hoc signed** (not yet Apple-notarized — see
-[Notarization](#upgrading-to-notarization)), macOS needs one nudge the first
-time:
+## Enable it
 
-- **If you installed via Homebrew:** nothing to do — the cask strips the
-  quarantine flag for you.
-- **If you installed manually:** the first launch may say *"Markdown Previewer
-  can't be opened because Apple cannot check it."* Open **System Settings →
-  Privacy & Security**, scroll down, and click **Open Anyway**. One time only.
+macOS ships previews turned off until you enable them. One-time setup:
 
-Then enable the extension:
+1. **Launch “Markdown Previewer”** once (this registers the extension). Its
+   welcome window has a button that jumps straight to the right settings pane.
+2. Open **System Settings → General → Login Items & Extensions → Quick Look**
+   and turn on **Markdown Previewer**.
+3. That's it.
 
-1. **System Settings → General → Login Items & Extensions → Quick Look**
-2. Turn on **Markdown Previewer**.
-3. In Finder, select a `.md` file and press <kbd>Space</kbd>.
+> **First launch on a from-source / direct-download build:** because these
+> builds are ad-hoc signed (not Apple-notarized — see
+> [Notarization](#upgrading-to-notarization)), macOS may say *“Markdown
+> Previewer can't be opened because Apple cannot check it.”* Open **System
+> Settings → Privacy & Security**, scroll down, and click **Open Anyway** — once.
+> Homebrew installs skip this.
 
-The app's welcome window has a button that jumps straight to that settings pane.
+---
 
-### Self-maintaining
+## Use
 
-You shouldn't ever need to touch Terminal. Each time the app launches it:
+Select any `.md` (or `.markdown`, `.mdown`, `.mkd`, …) file in Finder and press
+<kbd>Space</kbd>. The preview appears instantly, fully rendered. Press
+<kbd>Space</kbd> again to dismiss it.
 
-- registers this copy with Quick Look,
-- **removes stale duplicate registrations** (old versions, or a copy left in
-  Downloads) so you never see the extension listed twice, and
-- refreshes Quick Look's cache so a new or updated previewer takes effect
-  immediately.
-
-There's also a **Refresh Preview Cache** button in the window if a preview ever
-looks stale. Homebrew install/uninstall runs the same cache refresh for you.
-
-> Maintenance actions are logged to
-> `~/Library/Logs/MarkdownPreviewer-maintenance.log` (overwritten each launch)
-> if you ever need to check what happened.
-
-## What it renders
+Supported Markdown (GitHub-flavored):
 
 Headings · paragraphs · **bold** / *italic* / ~~strikethrough~~ · `inline code` ·
-fenced code blocks · blockquotes · ordered/unordered lists · GitHub task lists ·
-GFM tables (with column alignment) · links · images · horizontal rules.
+fenced code blocks · blockquotes · ordered / unordered / nested lists · task
+lists · GFM tables (with column alignment) · links · images · horizontal rules ·
+raw HTML.
 
-Rendering is powered by [apple/swift-markdown](https://github.com/apple/swift-markdown)
-(GitHub-flavored). JavaScript is disabled in the preview surface, so a malicious
-document can't execute code.
+Two ready-made sample files live in [`examples/`](examples/) if you want to see
+it in action.
 
-### A note on sandboxing
+### It maintains itself
 
-The **preview extension** — the component that reads and renders untrusted file
-content — runs fully inside the **App Sandbox**. The **container app** runs
-*outside* the sandbox so it can maintain Quick Look on your behalf (refresh the
-cache, prune duplicate registrations) via `qlmanage`/`lsregister`; it is a
-trivial onboarding launcher with no sensitive capability. If this app is ever
-submitted to the Mac App Store it would need to be re-sandboxed, which would
-drop the automatic maintenance in favor of manual cache refreshes.
+You should never need Terminal. Each time the app launches it registers itself,
+removes any stale duplicate registrations (e.g. an old copy left in Downloads),
+and refreshes Quick Look's cache so the latest version is always what you see.
+There's also a **Refresh Preview Cache** button in the app window if a preview
+ever looks stale.
+
+---
+
+## Update
+
+### If you installed with Homebrew
+
+```sh
+brew upgrade --cask markdown-previewer
+```
+
+### If you built from source (or downloaded the DMG)
+
+```sh
+cd markdown-previewer
+git pull            # if you cloned it
+./scripts/build.sh
+```
+
+Then open the new `dist/MarkdownPreviewer.dmg` and drag **Markdown Previewer**
+into **Applications**, replacing the old copy. **Launch it once** — on launch it
+automatically removes the old registration and refreshes Quick Look, so the new
+version takes effect immediately. No Terminal, no re-enabling.
+
+> If a preview still looks stale (rare), click **Refresh Preview Cache** in the
+> app, or run `qlmanage -r && qlmanage -r cache`.
+
+---
+
+## Uninstall
+
+- **Homebrew:** `brew uninstall --cask markdown-previewer`
+- **Manual:** run [`scripts/uninstall.sh`](scripts/uninstall.sh), or drag
+  **Markdown Previewer** from Applications to the Trash and run `qlmanage -r`.
+
+---
+
+## How it works
+
+The extension is a **data-based Quick Look provider**
+([`QLPreviewProvider`](https://developer.apple.com/documentation/quicklookui/qlpreviewprovider)):
+it converts the Markdown to HTML using
+[apple/swift-markdown](https://github.com/apple/swift-markdown) and hands that
+HTML to Quick Look, which renders it. This is what makes previews appear
+instantly — the extension never hosts its own web view.
+
+The preview **extension** runs fully inside the **App Sandbox** (it processes
+untrusted file content). The small **container app** runs *outside* the sandbox
+so it can maintain Quick Look on your behalf (refresh the cache, prune duplicate
+registrations) via `qlmanage`/`lsregister`. If the app were ever submitted to the
+Mac App Store it would need to be re-sandboxed, dropping the automatic
+maintenance in favor of manual cache refreshes.
+
+---
 
 ## Development
-
-Requirements: **Xcode** and **[XcodeGen](https://github.com/yonaskolb/XcodeGen)**
-(`brew install xcodegen`).
 
 The `.xcodeproj` is **generated** from [`project.yml`](project.yml) and is not
 committed. Generate it, then open:
@@ -104,36 +167,42 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 
 | Path | What it is |
 |------|------------|
-| `Sources/App/` | Tiny SwiftUI container app + onboarding. Exists to register and enable the extension. |
+| `Sources/App/` | Tiny SwiftUI container app + onboarding. Registers and enables the extension. |
 | `Sources/App/QuickLookMaintenance.swift` | Self-heal on launch: register, prune duplicates, refresh Quick Look. |
-| `Sources/QuickLookExtension/` | The Quick Look preview extension. |
+| `Sources/QuickLookExtension/PreviewProvider.swift` | The data-based `QLPreviewProvider` that returns rendered HTML to Quick Look. |
 | `Sources/QuickLookExtension/MarkdownHTMLRenderer.swift` | Markdown AST → HTML (a small `MarkupVisitor`). |
 | `Sources/QuickLookExtension/HTMLTemplate.swift` | Inline CSS page wrapper (light/dark). |
-| `Sources/QuickLookExtension/PreviewViewController.swift` | `QLPreviewingController` that loads the HTML in a `WKWebView`. |
+| `Sources/QuickLookExtension/Info.plist` | Declares the `.md` UTIs and `QLIsDataBasedPreview`. |
 | `Tests/` | Renderer unit tests. |
 | `scripts/build.sh` | Builds the ad-hoc-signed DMG. |
 | `scripts/uninstall.sh` | Manual uninstall: remove app, unregister, refresh Quick Look. |
 | `Casks/` | Homebrew Cask template. |
+| `examples/` | Sample Markdown files. |
 
-## Releasing
+---
+
+## Releasing *(for maintainers)*
 
 1. Bump `MARKETING_VERSION` in `project.yml` and `version` in `Casks/markdown-previewer.rb`.
 2. Push a tag: `git tag v1.0.0 && git push --tags`.
 3. The [release workflow](.github/workflows/release.yml) builds the DMG and
    attaches it to a GitHub Release.
-4. Copy the printed `sha256` into the cask, commit it to your tap repo.
+4. Copy the printed `sha256` into the cask and commit it to your tap repo
+   (`OWNER/homebrew-tap`).
 
 ### Upgrading to notarization
 
-The frictionless path is Apple notarization (needs the **Apple Developer
+The frictionless install path is Apple notarization (needs the **Apple Developer
 Program**, $99/yr). When you're ready:
 
 1. In `project.yml`, set `DEVELOPMENT_TEAM` and change `CODE_SIGN_IDENTITY` to
    `"Developer ID Application"`.
-2. Add `notarytool` submission + `stapler` to `scripts/build.sh`.
-3. Drop the `postflight`/quarantine block from the cask.
+2. Add `notarytool` submission + `stapler` stapling to `scripts/build.sh`.
+3. Drop the quarantine-stripping `postflight` block from the cask.
 
-No other code changes are needed — the quarantine warning simply disappears.
+No app code changes are needed — the “unidentified developer” warning disappears.
+
+---
 
 ## License
 
