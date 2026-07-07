@@ -42,6 +42,13 @@ hdiutil create \
   "$DIST/MarkdownPreviewer.dmg" >/dev/null
 rm -rf "$STAGING"
 
+# xcodebuild auto-registers the freshly built .app with LaunchServices, which
+# makes a *second* Quick Look extension appear alongside any copy installed in
+# /Applications. Un-register the build-folder copy so it doesn't pollute the
+# system extensions list — the DMG is the only artifact we care about here.
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister"
+[ -x "$LSREGISTER" ] && "$LSREGISTER" -u "$APP" >/dev/null 2>&1 || true
+
 echo "==> Done: $DIST/MarkdownPreviewer.dmg"
 echo -n "    sha256: "
 shasum -a 256 "$DIST/MarkdownPreviewer.dmg" | awk '{print $1}'
