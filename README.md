@@ -7,6 +7,13 @@ code blocks, and more. Light- and dark-mode aware.
 
 > Does one thing well: previews Markdown. No settings to fiddle with.
 
+<p align="center">
+  <img src="docs/screenshot-light.png" width="46%" alt="Rendered Markdown preview in light mode">
+  &nbsp;&nbsp;
+  <img src="docs/screenshot-dark.png" width="46%" alt="Rendered Markdown preview in dark mode">
+</p>
+<p align="center"><sub>The same file previewed in light and dark mode — Quick Look follows your system appearance.</sub></p>
+
 **Requirements:** macOS 13 (Ventura) or later.
 
 ---
