@@ -1,0 +1,71 @@
+name: MarkdownPreviewer
+options:
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    GENERATE_INFOPLIST_FILE: "NO"
+    # Free / no Apple Developer account: ad-hoc sign so it runs locally on
+    # Apple Silicon. Swap CODE_SIGN_IDENTITY + DEVELOPMENT_TEAM later to notarize.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: "YES"
+
+packages:
+  Markdown:
+    url: https://github.com/apple/swift-markdown.git
+    revision: 3c6f9523da3a1ec2fd829673e472d95b8097a3b8
+
+targets:
+  MarkdownPreviewer:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/App
+    settings:
+      base:
+        PRODUCT_NAME: "Markdown Previewer"
+        PRODUCT_BUNDLE_IDENTIFIER: com.apjuszczyk.markdownpreviewer
+        INFOPLIST_FILE: Sources/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/App/App.entitlements
+        LSApplicationCategoryType: public.app-category.developer-tools
+    dependencies:
+      - target: QuickLookExtension
+        embed: true
+
+  QuickLookExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - Sources/QuickLookExtension
+    settings:
+      base:
+        PRODUCT_NAME: QuickLookExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.apjuszczyk.markdownpreviewer.QuickLook
+        INFOPLIST_FILE: Sources/QuickLookExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Sources/QuickLookExtension/Extension.entitlements
+    dependencies:
+      - package: Markdown
+        product: Markdown
+
+  RendererTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Sources/QuickLookExtension/MarkdownHTMLRenderer.swift
+      - Sources/QuickLookExtension/HTMLTemplate.swift
+      - Tests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.apjuszczyk.markdownpreviewer.RendererTests
+        GENERATE_INFOPLIST_FILE: "YES"
+    dependencies:
+      - package: Markdown
+        product: Markdown

@@ -1,0 +1,31 @@
+name: Release
+
+# Cut a release by pushing a tag like `v1.0.0`.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Build DMG
+        run: ./scripts/build.sh
+
+      - name: Checksum
+        run: shasum -a 256 dist/MarkdownPreviewer.dmg
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MarkdownPreviewer.dmg
+          generate_release_notes: true
