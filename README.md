@@ -43,8 +43,22 @@ Then enable the extension:
 
 The app's welcome window has a button that jumps straight to that settings pane.
 
-> If a preview looks stale after updating, reset Quick Look's cache:
-> `qlmanage -r && qlmanage -r cache`
+### Self-maintaining
+
+You shouldn't ever need to touch Terminal. Each time the app launches it:
+
+- registers this copy with Quick Look,
+- **removes stale duplicate registrations** (old versions, or a copy left in
+  Downloads) so you never see the extension listed twice, and
+- refreshes Quick Look's cache so a new or updated previewer takes effect
+  immediately.
+
+There's also a **Refresh Preview Cache** button in the window if a preview ever
+looks stale. Homebrew install/uninstall runs the same cache refresh for you.
+
+> Maintenance actions are logged to
+> `~/Library/Logs/MarkdownPreviewer-maintenance.log` (overwritten each launch)
+> if you ever need to check what happened.
 
 ## What it renders
 
@@ -55,6 +69,16 @@ GFM tables (with column alignment) · links · images · horizontal rules.
 Rendering is powered by [apple/swift-markdown](https://github.com/apple/swift-markdown)
 (GitHub-flavored). JavaScript is disabled in the preview surface, so a malicious
 document can't execute code.
+
+### A note on sandboxing
+
+The **preview extension** — the component that reads and renders untrusted file
+content — runs fully inside the **App Sandbox**. The **container app** runs
+*outside* the sandbox so it can maintain Quick Look on your behalf (refresh the
+cache, prune duplicate registrations) via `qlmanage`/`lsregister`; it is a
+trivial onboarding launcher with no sensitive capability. If this app is ever
+submitted to the Mac App Store it would need to be re-sandboxed, which would
+drop the automatic maintenance in favor of manual cache refreshes.
 
 ## Development
 
@@ -81,12 +105,14 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 | Path | What it is |
 |------|------------|
 | `Sources/App/` | Tiny SwiftUI container app + onboarding. Exists to register and enable the extension. |
+| `Sources/App/QuickLookMaintenance.swift` | Self-heal on launch: register, prune duplicates, refresh Quick Look. |
 | `Sources/QuickLookExtension/` | The Quick Look preview extension. |
 | `Sources/QuickLookExtension/MarkdownHTMLRenderer.swift` | Markdown AST → HTML (a small `MarkupVisitor`). |
 | `Sources/QuickLookExtension/HTMLTemplate.swift` | Inline CSS page wrapper (light/dark). |
 | `Sources/QuickLookExtension/PreviewViewController.swift` | `QLPreviewingController` that loads the HTML in a `WKWebView`. |
 | `Tests/` | Renderer unit tests. |
 | `scripts/build.sh` | Builds the ad-hoc-signed DMG. |
+| `scripts/uninstall.sh` | Manual uninstall: remove app, unregister, refresh Quick Look. |
 | `Casks/` | Homebrew Cask template. |
 
 ## Releasing

@@ -34,15 +34,27 @@ struct OnboardingView: View {
                 }
                 .controlSize(.large)
 
+                Button {
+                    QuickLookMaintenance.refresh()
+                } label: {
+                    Label("Refresh Preview Cache", systemImage: "arrow.clockwise")
+                }
+                .controlSize(.large)
+
                 Spacer()
             }
 
-            Text("Tip: if a preview doesn't refresh, run `qlmanage -r` in Terminal to reset Quick Look's cache.")
+            Text("This app keeps Quick Look tidy automatically — it refreshes the preview cache and removes duplicate registrations each time it launches.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
         .padding(28)
         .frame(width: 460)
+        // Register this copy, prune stale duplicates, and refresh Quick Look so
+        // the extension works immediately after install/update — no Terminal needed.
+        .task {
+            QuickLookMaintenance.activateInBackground()
+        }
     }
 
     private func openExtensionSettings() {

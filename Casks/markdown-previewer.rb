@@ -17,12 +17,24 @@ cask "markdown-previewer" do
 
   app "Markdown Previewer.app"
 
-  # This build is ad-hoc signed (no Apple notarization yet), so macOS marks it
-  # as quarantined. Strip that flag on install so users don't hit the
-  # "unidentified developer" wall. Remove this block once the app is notarized.
   postflight do
+    # This build is ad-hoc signed (no Apple notarization yet), so macOS marks it
+    # as quarantined. Strip that flag so users don't hit the "unidentified
+    # developer" wall. Remove this line once the app is notarized.
     system_command "/usr/bin/xattr",
                    args: ["-dr", "com.apple.quarantine", "#{appdir}/Markdown Previewer.app"]
+
+    # Activate the extension immediately: refresh Quick Look's cache so the new
+    # (or updated) previewer takes effect without a re-login.
+    system_command "/usr/bin/qlmanage", args: ["-r"]
+    system_command "/usr/bin/qlmanage", args: ["-r", "cache"]
+  end
+
+  uninstall quit: "com.apjuszczyk.markdownpreviewer"
+
+  # Clean up Quick Look's cache after removal too.
+  uninstall_postflight do
+    system_command "/usr/bin/qlmanage", args: ["-r"]
   end
 
   zap trash: [
