@@ -25,18 +25,21 @@ You need [Xcode](https://apps.apple.com/app/xcode/id497799835) and
 ```sh
 brew install xcodegen
 
-git clone https://github.com/OWNER/markdown-previewer.git
+git clone https://github.com/4rek/markdown-previewer.git
 cd markdown-previewer
-./scripts/build.sh
+./scripts/install.sh
 ```
 
-This produces `dist/MarkdownPreviewer.dmg`. Open it, drag **Markdown Previewer**
-into **Applications**, then continue to [Enable it](#enable-it).
+`install.sh` builds the app, installs it into **/Applications**, refreshes Quick
+Look, and launches it. Then continue to [Enable it](#enable-it).
+
+> Prefer a distributable disk image instead? Run `./scripts/build.sh` to produce
+> `dist/MarkdownPreviewer.dmg` and install it by hand.
 
 ### Option B — Homebrew *(once published)*
 
 ```sh
-brew install --cask OWNER/tap/markdown-previewer
+brew install --cask 4rek/tap/markdown-previewer
 ```
 
 Homebrew installs the app and clears the download quarantine for you. Then
@@ -44,7 +47,7 @@ continue to [Enable it](#enable-it).
 
 ### Option C — Direct download *(once published)*
 
-1. Download `MarkdownPreviewer.dmg` from the [latest release](https://github.com/OWNER/markdown-previewer/releases/latest).
+1. Download `MarkdownPreviewer.dmg` from the [latest release](https://github.com/4rek/markdown-previewer/releases/latest).
 2. Drag **Markdown Previewer** into **Applications**.
 
 ---
@@ -102,18 +105,17 @@ ever looks stale.
 brew upgrade --cask markdown-previewer
 ```
 
-### If you built from source (or downloaded the DMG)
+### If you built from source
 
 ```sh
 cd markdown-previewer
-git pull            # if you cloned it
-./scripts/build.sh
+git pull
+./scripts/install.sh
 ```
 
-Then open the new `dist/MarkdownPreviewer.dmg` and drag **Markdown Previewer**
-into **Applications**, replacing the old copy. **Launch it once** — on launch it
-automatically removes the old registration and refreshes Quick Look, so the new
-version takes effect immediately. No Terminal, no re-enabling.
+That's the whole update: `install.sh` rebuilds, replaces the copy in
+**/Applications**, refreshes Quick Look, and relaunches — no dragging, no
+re-enabling. The new version takes effect immediately.
 
 > If a preview still looks stale (rare), click **Refresh Preview Cache** in the
 > app, or run `qlmanage -r && qlmanage -r cache`.
@@ -174,7 +176,8 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 | `Sources/QuickLookExtension/HTMLTemplate.swift` | Inline CSS page wrapper (light/dark). |
 | `Sources/QuickLookExtension/Info.plist` | Declares the `.md` UTIs and `QLIsDataBasedPreview`. |
 | `Tests/` | Renderer unit tests. |
-| `scripts/build.sh` | Builds the ad-hoc-signed DMG. |
+| `scripts/install.sh` | Build and install/update into /Applications, then activate Quick Look. |
+| `scripts/build.sh` | Builds the ad-hoc-signed DMG for distribution. |
 | `scripts/uninstall.sh` | Manual uninstall: remove app, unregister, refresh Quick Look. |
 | `Casks/` | Homebrew Cask template. |
 | `examples/` | Sample Markdown files. |
@@ -188,7 +191,7 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 3. The [release workflow](.github/workflows/release.yml) builds the DMG and
    attaches it to a GitHub Release.
 4. Copy the printed `sha256` into the cask and commit it to your tap repo
-   (`OWNER/homebrew-tap`).
+   (`4rek/homebrew-tap`).
 
 ### Upgrading to notarization
 
