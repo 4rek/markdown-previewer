@@ -8,6 +8,10 @@ code blocks, and more. Light- and dark-mode aware.
 > Does one thing well: previews Markdown. No settings to fiddle with.
 
 <p align="center">
+  <img src="docs/demo.gif" width="82%" alt="Pressing Space on a Markdown file in Finder to see it rendered">
+</p>
+
+<p align="center">
   <img src="docs/screenshot-light.png" width="46%" alt="Rendered Markdown preview in light mode">
   &nbsp;&nbsp;
   <img src="docs/screenshot-dark.png" width="46%" alt="Rendered Markdown preview in dark mode">
@@ -149,6 +153,7 @@ xcodebuild -project MarkdownPreviewer.xcodeproj -scheme RendererTests \
 | `scripts/install.sh` | Build and install/update into /Applications, then activate Quick Look. |
 | `scripts/build.sh` | Builds the ad-hoc-signed DMG for distribution. |
 | `scripts/uninstall.sh` | Manual uninstall: remove app, unregister, refresh Quick Look. |
+| `scripts/make-demo.sh` | Convert a screen recording into `docs/demo.gif`. |
 | `Casks/` | Homebrew Cask template. |
 | `examples/` | Sample Markdown files. |
 
