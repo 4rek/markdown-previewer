@@ -23,12 +23,19 @@ code blocks, and more. Light- and dark-mode aware.
 Install with [Homebrew](https://brew.sh):
 
 ```sh
-brew install --cask 4rek/tap/markdown-previewer
+brew tap 4rek/tap
+brew trust 4rek/tap        # one-time; see note below
+brew install --cask markdown-previewer
 ```
 
-Homebrew downloads the app, installs it into **/Applications**, and clears the
-download quarantine — so there's no “unidentified developer” prompt to click
-through. Then [enable the extension](#enable-it).
+Homebrew installs the app into **/Applications** and clears the download
+quarantine — so there's no “unidentified developer” prompt to click through.
+Then [enable the extension](#enable-it).
+
+> **Why `brew trust`?** The cask runs a small post-install step (it strips the
+> quarantine flag so the un-notarized app opens cleanly). Homebrew requires you
+> to trust a third-party tap once before it will run such steps. It's a one-time
+> action per tap.
 
 > Want to build it yourself or contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
