@@ -20,42 +20,17 @@ code blocks, and more. Light- and dark-mode aware.
 
 ## Install
 
-There are two ways to install. Building from source works today; the Homebrew
-route becomes available once the app is published to a tap (see
-[Releasing](#releasing-for-maintainers)).
-
-### Option A — Build from source
-
-You need [Xcode](https://apps.apple.com/app/xcode/id497799835) and
-[XcodeGen](https://github.com/yonaskolb/XcodeGen):
-
-```sh
-brew install xcodegen
-
-git clone https://github.com/4rek/markdown-previewer.git
-cd markdown-previewer
-./scripts/install.sh
-```
-
-`install.sh` builds the app, installs it into **/Applications**, refreshes Quick
-Look, and launches it. Then continue to [Enable it](#enable-it).
-
-> Prefer a distributable disk image instead? Run `./scripts/build.sh` to produce
-> `dist/MarkdownPreviewer.dmg` and install it by hand.
-
-### Option B — Homebrew *(once published)*
+Install with [Homebrew](https://brew.sh):
 
 ```sh
 brew install --cask 4rek/tap/markdown-previewer
 ```
 
-Homebrew installs the app and clears the download quarantine for you. Then
-continue to [Enable it](#enable-it).
+Homebrew downloads the app, installs it into **/Applications**, and clears the
+download quarantine — so there's no “unidentified developer” prompt to click
+through. Then [enable the extension](#enable-it).
 
-### Option C — Direct download *(once published)*
-
-1. Download `MarkdownPreviewer.dmg` from the [latest release](https://github.com/4rek/markdown-previewer/releases/latest).
-2. Drag **Markdown Previewer** into **Applications**.
+> Want to build it yourself or contribute? See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -67,14 +42,7 @@ macOS ships previews turned off until you enable them. One-time setup:
    welcome window has a button that jumps straight to the right settings pane.
 2. Open **System Settings → General → Login Items & Extensions → Quick Look**
    and turn on **Markdown Previewer**.
-3. That's it.
-
-> **First launch on a from-source / direct-download build:** because these
-> builds are ad-hoc signed (not Apple-notarized — see
-> [Notarization](#upgrading-to-notarization)), macOS may say *“Markdown
-> Previewer can't be opened because Apple cannot check it.”* Open **System
-> Settings → Privacy & Security**, scroll down, and click **Open Anyway** — once.
-> Homebrew installs skip this.
+3. That's it — select a `.md` file in Finder and press <kbd>Space</kbd>.
 
 ---
 
@@ -106,34 +74,22 @@ ever looks stale.
 
 ## Update
 
-### If you installed with Homebrew
-
 ```sh
 brew upgrade --cask markdown-previewer
 ```
 
-### If you built from source
-
-```sh
-cd markdown-previewer
-git pull
-./scripts/install.sh
-```
-
-That's the whole update: `install.sh` rebuilds, replaces the copy in
-**/Applications**, refreshes Quick Look, and relaunches — no dragging, no
-re-enabling. The new version takes effect immediately.
-
-> If a preview still looks stale (rare), click **Refresh Preview Cache** in the
-> app, or run `qlmanage -r && qlmanage -r cache`.
+The app self-heals on its next launch (refreshes Quick Look, prunes any stale
+registrations), so the new version takes effect with no re-enabling. If a preview
+ever looks stale, click **Refresh Preview Cache** in the app window or run
+`qlmanage -r && qlmanage -r cache`.
 
 ---
 
 ## Uninstall
 
-- **Homebrew:** `brew uninstall --cask markdown-previewer`
-- **Manual:** run [`scripts/uninstall.sh`](scripts/uninstall.sh), or drag
-  **Markdown Previewer** from Applications to the Trash and run `qlmanage -r`.
+```sh
+brew uninstall --cask markdown-previewer
+```
 
 ---
 
